@@ -4,15 +4,17 @@ import oracledb from 'oracledb';
 const app = express();
 app.use(express.json());
 
-// Credenciales comunes para todos los Oracle
+// Parámetros comunes a todas las BD
 const COMMON_USER = process.env.DB_USER || 'consu';
 const COMMON_PASSWORD = process.env.DB_PASSWORD || 'TU_PASS';
+const COMMON_SERVICE = process.env.DB_SERVICE || 'ORACLE11';
+const COMMON_PORT = process.env.DB_PORT || 1521;
 
-// Distintas cadenas de conexión según target
-const connectStrings = {
-  A: process.env.DB_CONNECT_A || '10.8.0.2:1521/ORACLE11',
-  B: process.env.DB_CONNECT_B || '10.8.0.3:1521/ORACLE11',
-  C: process.env.DB_CONNECT_C || '10.8.0.4:1521/ORACLE11',
+// Solo cambia la IP según target
+const ipByTarget = {
+  A: process.env.DB_IP_A || '10.8.0.2',
+  B: process.env.DB_IP_B || '10.8.0.3',
+  C: process.env.DB_IP_C || '10.8.0.4',
 };
 
 const DEFAULT_TARGET = process.env.DB_DEFAULT_TARGET || 'A';
@@ -29,16 +31,16 @@ app.post('/query', async (req, res) => {
   }
 
   const chosenTarget = target || DEFAULT_TARGET;
-  const connectString = connectStrings[chosenTarget];
+  const ip = ipByTarget[chosenTarget];
 
-  if (!connectString) {
+  if (!ip) {
     return res.status(400).json({ error: `Invalid target "${chosenTarget}"` });
   }
 
   const dbConfig = {
     user: COMMON_USER,
     password: COMMON_PASSWORD,
-    connectString,
+    connectString: `${ip}:${COMMON_PORT}/${COMMON_SERVICE}`,
   };
 
   let connection;
@@ -82,4 +84,5 @@ initOracle()
     console.error('Error inicializando Oracle client:', err);
     process.exit(1);
   });
+
 
