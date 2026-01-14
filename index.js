@@ -12,7 +12,7 @@ const COMMON_PORT = process.env.DB_PORT || 1521;
 
 // Solo cambia la IP según target
 const ipByTarget = {
-  A: process.env.DB_IP_A || '10.8.0.2',
+  A: process.env.DB_IP_A || '10.8.0.6',
   B: process.env.DB_IP_B || '10.8.0.3',
   C: process.env.DB_IP_C || '10.8.0.4',
 };
